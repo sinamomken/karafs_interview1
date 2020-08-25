@@ -1,8 +1,7 @@
-package ir.sinamomken.karafs_interview1.ui
+package ir.sinamomken.karafs_interview1.ui.main
 
 import android.util.Log
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ir.sinamomken.karafs_interview1.KarafsApplication
@@ -28,10 +27,10 @@ class MainActivityPresenter() : MainActivityContract.Presenter{
                             nameEntities.add(nameEntity)
                         }
 
-                        Log.i(TAG, "nameEntities = " + nameEntities)
+                        Log.i(TAG, "entities = " + nameEntities.toString())
 
                         KarafsApplication.database?.let{
-//                            it.getNamesDao().deleteAllNames()
+                            it.getNamesDao().deleteAllNames()
                             it.getNamesDao().insertNames(nameEntities)
                         }
                     },
@@ -56,21 +55,6 @@ class MainActivityPresenter() : MainActivityContract.Presenter{
         }
         val nameEntity = NameEntity(firstName = firstName, middleName = middleName, lastName = lastName)
         return nameEntity
-    }
-
-    override fun getDataFromDatabase(): Flowable<List<NameEntity>>? {
-        var output : Flowable<List<NameEntity>>? = null
-        if(KarafsApplication.database == null){
-            Log.i(TAG, "KarafsApplication.database = null")
-        }
-        output = KarafsApplication.database?.let {
-            it.getNamesDao().getAllNames()
-//                .switchMap { data ->
-//                    Log.i(TAG, "from database --> \n" + data.toString())
-//                    Flowable.just(data)
-//            }
-        }
-        return output
     }
 
     override fun onActivityDestroy() {
