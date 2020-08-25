@@ -10,6 +10,6 @@ interface ResultAtivityContract {
     }
 
     interface Presenter{
-        fun getResult() : Observable<String>
+        fun getResult() : Flowable<String>
     }
 }

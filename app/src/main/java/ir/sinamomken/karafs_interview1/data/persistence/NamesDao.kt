@@ -19,7 +19,7 @@ interface NamesDao {
     @Query("SELECT * FROM NameEntity")
     fun getAllNames() : Flowable<List<NameEntity>>
 
-    @Query("SELECT * FROM NameEntity WHERE middleName LIKE :lastOrMiddleName OR lastName LIKE :lastOrMiddleName")
+    @Query("SELECT * FROM NameEntity WHERE (middleName LIKE :lastOrMiddleName) OR (lastName LIKE :lastOrMiddleName)" )
     fun getNamesWithSimilarLastName(lastOrMiddleName:String) : List<NameEntity>
 
     @Query("DELETE FROM NameEntity")

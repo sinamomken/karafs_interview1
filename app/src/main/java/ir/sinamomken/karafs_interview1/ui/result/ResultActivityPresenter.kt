@@ -1,41 +1,51 @@
 package ir.sinamomken.karafs_interview1.ui.result
 
+import android.util.ArraySet
 import android.util.Log
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import ir.sinamomken.karafs_interview1.KarafsApplication
 import ir.sinamomken.karafs_interview1.data.persistence.NameEntity
+import java.util.concurrent.Flow
 
 class ResultActivityPresenter : ResultAtivityContract.Presenter {
     val TAG = ResultActivityPresenter::class.java.simpleName
     val namesDisposable = CompositeDisposable()
 
-    override fun getResult(): Observable<String> {
-
-//        return KarafsApplication.database!!.getNamesDao().getAllNames().flatMap {
-//            return@flatMap getResultFromData(it)
-//        }
-
-        return Observable.just("example")
+    override fun getResult(): Flowable<String> {
+        // Get all entities from DB
+        return KarafsApplication.database!!.getNamesDao().getAllNames()
+            .map { getResultFromData(it) } // Calculate result string for entities
     }
 
-    private fun getResultFromData(listOfNameEntities: List<NameEntity>): Observable<String> {
+    private fun getResultFromData(listOfNameEntities: List<NameEntity>): String {
         val namesDao = KarafsApplication.database!!.getNamesDao()
-        var resultStr = ""
+        var resultStr = "\n"
+
         for (entity in listOfNameEntities) {
-            var listOfRelateds = ArrayList<NameEntity>()
-            listOfRelateds.addAll(
-                namesDao.getNamesWithSimilarLastName(entity.middleName)
-            )
-            listOfRelateds.addAll(
-                namesDao.getNamesWithSimilarLastName(entity.lastName)
-            )
+            var listOfRelateds = ArraySet<NameEntity>()
+
+            // Finding those with similar middleName
+            if(!entity.middleName.equals("")) {
+                listOfRelateds.addAll(
+                    namesDao.getNamesWithSimilarLastName(entity.middleName)
+                )
+            }
+            // Finding those with similar lastName
+            if(!entity.lastName.equals("")) {
+                listOfRelateds.addAll(
+                    namesDao.getNamesWithSimilarLastName(entity.lastName)
+                )
+            }
+            // Remove itself from list of relateds
+            listOfRelateds.remove(entity)
 
             if (listOfRelateds.size == 0) {
                 listOfRelateds.add(NameEntity("no one", "", ""))
             }
 
+            // Creating "Foo is related to Bar1, ..." string
             var relatedsStr: String = "${entity.firstName} is related to "
             var i: Int = 0
             for (relatedEntity in listOfRelateds) {
@@ -48,9 +58,10 @@ class ResultActivityPresenter : ResultAtivityContract.Presenter {
                 i++
             }
 
-            resultStr += relatedsStr
+            resultStr += relatedsStr + "\n"
         }
 
-        return Observable.just(resultStr)
+        Log.i(TAG, "resultStr = "+resultStr)
+        return resultStr
     }
 }

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import ir.sinamomken.karafs_interview1.R
 import kotlinx.android.synthetic.main.activity_result.*
@@ -11,6 +12,7 @@ import kotlinx.android.synthetic.main.activity_result.*
 class ResultActivity : AppCompatActivity() , ResultAtivityContract.View{
     val TAG = ResultActivity::class.java.name
     val resultActivityPresenter = ResultActivityPresenter()
+    val compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,22 +21,26 @@ class ResultActivity : AppCompatActivity() , ResultAtivityContract.View{
         subscribeToResultFromPresenter()
     }
 
-//    override fun subscribeToDataFromDatabase() {
-//        Log.i(TAG, "subscribeToDataFromDatabase: ")
-//        resultActivityPresenter.getDataFromDatabase()?.let {
-//            it.subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(
-//                    { nameEntitiesList ->
-//                        Log.i(TAG, "from Presenter -->\n" + nameEntitiesList.toString())
-//                        result_tv.text = nameEntitiesList.toString()
-//                    },
-//                    {error -> Log.e(TAG, error.message!!)}
-//                )
-//        }
-//    }
-
     override fun subscribeToResultFromPresenter() {
-        TODO("Not yet implemented")
+        Log.i(TAG, "subscribeToResultFromPresenter")
+        compositeDisposable.add( resultActivityPresenter.getResult()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {
+//                    Log.i(TAG, "result str = " + it)
+                    result_tv.text = it
+                },
+                {error -> Log.e(TAG, error.message!!)}
+            )
+        )
     }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
+    }
+
+
 }
