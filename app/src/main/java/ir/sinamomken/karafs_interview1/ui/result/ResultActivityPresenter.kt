@@ -3,15 +3,29 @@ package ir.sinamomken.karafs_interview1.ui.result
 import android.util.ArraySet
 import android.util.Log
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import ir.sinamomken.karafs_interview1.KarafsApplication
 import ir.sinamomken.karafs_interview1.data.persistence.NameEntity
-import java.util.concurrent.Flow
 
-class ResultActivityPresenter : ResultAtivityContract.Presenter {
+class ResultActivityPresenter : ResultActivityContract.Presenter {
     val TAG = ResultActivityPresenter::class.java.simpleName
     val namesDisposable = CompositeDisposable()
+
+    override fun getOriginalDataFromDatabase(): Flowable<String> {
+        return KarafsApplication.database!!.getNamesDao().getAllNames()
+            .map{
+                var resultStr = ""
+                it.forEach {
+                    if( it.middleName == ""){
+                        resultStr += "${it.firstName} ${it.lastName}"
+                    }else{
+                        resultStr += "${it.firstName} ${it.middleName}-${it.lastName}"
+                    }
+                    resultStr += "\n"
+                }
+                return@map resultStr
+            }
+    }
 
     override fun getResult(): Flowable<String> {
         // Get all entities from DB
@@ -21,7 +35,7 @@ class ResultActivityPresenter : ResultAtivityContract.Presenter {
 
     private fun getResultFromData(listOfNameEntities: List<NameEntity>): String {
         val namesDao = KarafsApplication.database!!.getNamesDao()
-        var resultStr = "\n"
+        var resultStr = ""
 
         for (entity in listOfNameEntities) {
             var listOfRelateds = ArraySet<NameEntity>()

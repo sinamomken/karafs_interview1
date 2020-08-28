@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">karafs_interview1</string>
+    <string name="get_data_from_api">گرفتن اطلاعات از api</string>
+    <string name="get">دریافت</string>
+    <string name="username">نام کاربری</string>
+    <string name="password">رمز عبور</string>
+    <string name="username_should_not_be_empty">نام کاربری نباید خالی باشد.</string>
+    <string name="password_should_not_be_empty">رمز عبور نباید خالی باشد.</string>
+    <string name="original_data_in_db">داده‌های اصلی در DB:</string>
+    <string name="result_of_processing_data">نتیجه پردازش داده‌ها:</string>
+    <string name="initializing">در حال پردازش اطلاعات</string>
 </resources>

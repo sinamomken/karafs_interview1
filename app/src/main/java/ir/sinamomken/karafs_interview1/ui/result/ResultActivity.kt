@@ -9,7 +9,7 @@ import io.reactivex.schedulers.Schedulers
 import ir.sinamomken.karafs_interview1.R
 import kotlinx.android.synthetic.main.activity_result.*
 
-class ResultActivity : AppCompatActivity() , ResultAtivityContract.View{
+class ResultActivity : AppCompatActivity() , ResultActivityContract.View{
     val TAG = ResultActivity::class.java.name
     val resultActivityPresenter = ResultActivityPresenter()
     val compositeDisposable = CompositeDisposable()
@@ -18,7 +18,24 @@ class ResultActivity : AppCompatActivity() , ResultAtivityContract.View{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_result)
 
+        subscribeToOriginalFromPresenter()
         subscribeToResultFromPresenter()
+    }
+
+
+    override fun subscribeToOriginalFromPresenter() {
+        Log.i(TAG, "subscribeToOriginalFromPresenter")
+        compositeDisposable.add( resultActivityPresenter.getOriginalDataFromDatabase()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {
+//                    Log.i(TAG, "result str = " + it)
+                    original_tv.text = it
+                },
+                {error -> Log.e(TAG, error.message!!)}
+            )
+        )
     }
 
     override fun subscribeToResultFromPresenter() {

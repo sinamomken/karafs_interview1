@@ -30,20 +30,10 @@ class MainActivity : AppCompatActivity(),  MainActivityContract.View{
             val username: String = editTextUsername.text.toString().trim()
             val password: String = editTextPassword.text.toString()
 
-            // Validations
-            if (username.isEmpty()) {
-                editTextUsername.error = "Username required"
-                editTextUsername.requestFocus()
+            if(validateUserAndPass(username, password)==false)
                 return@setOnClickListener
-            }
 
-            if (password.isEmpty()) {
-                editTextPassword.error = "Password should not be empty"
-                editTextPassword.requestFocus()
-                return@setOnClickListener
-            }
 
-//            fetchData(username, password)
             val authStr = RetrofitClient.encodeToBase64(username, password)
             invokePresenterToCallApiAndSaveInDb(authStr)
 
@@ -51,6 +41,21 @@ class MainActivity : AppCompatActivity(),  MainActivityContract.View{
                 Intent(this, ResultActivity::class.java)
             )
         }
+    }
+
+    private fun validateUserAndPass(username:String, password:String) : Boolean{
+        /*if (username.isEmpty()) {
+            editTextUsername.error = getString(R.string.username_should_not_be_empty)
+            editTextUsername.requestFocus()
+            return false
+        }
+
+        if (password.isEmpty()) {
+            editTextPassword.error = getString(R.string.password_should_not_be_empty)
+            editTextPassword.requestFocus()
+            return false
+        }*/
+        return true
     }
 
     override fun invokePresenterToCallApiAndSaveInDb(authString: String) {
